@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .cell {
+      width: 100px;
+      height: 100px;
+      display: inline-block;
+      vertical-align: middle;
+      background-color: green;
+      border: 1px solid #000000;
+
+      line-height: 100px;
+      font-size: 50px;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="bord"></div>
+
+  <script>
+    let patten = [
+      [0, 2, 0],
+      [0, 1, 0],
+      [0, 0, 0]
+    ];
+
+    let color = 1;
+
+    function show() {
+      let bord = document.getElementById('bord');
+      bord.innerHTML = '';
+      for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+          let cell = document.createElement('div');
+          cell.classList.add('cell');
+          cell.innerText = patten[i][j] === 2 ? '👷‍♂️' : patten[i][j] === 1 ? '👮‍♂️' : '';
+          cell.addEventListener('click', () => move(j, i));
+          bord.appendChild(cell);
+        }
+        bord.appendChild(document.createElement('br'));
+      }
+    }
+
+    function move(x, y) {
+      patten[y][x] = color;
+      if (check(patten, color )){
+        alert( color === 2 ? '老头赢' : '警察赢了')
+      }
+      color = 3 - color;
+      if ( willWin(patten, color)){
+        console.log(color === 2 ? '老头将赢' : '警察将赢')
+      }
+      show();
+    }
+
+    // 判断是否赢了
+    function check(patten, color) {
+      // 检查行
+      for (let i = 0; i < 3; i++) {
+        let win = true;
+        for (let j = 0; j < 3; j++) {
+          if (patten[i][j] !== color) {
+            win = false;
+          }
+        };
+        if (win) {
+          return true;
+        }
+      }
+      // 检查列
+      for (let i = 0; i < 3; i++) {
+        let win = true;
+        for (let j = 0; j < 3; j++) {
+          if (patten[j][i] !== color) {
+            win = false;
+          }
+        }
+        if ( win ) {
+          return true;
+        }
+      };
+      // 检查左斜；块级作用域
+      {
+        let win = true;
+        for (let j = 0; j < 3; j++) {
+          if (patten[j][j] !== color) {
+            win = false
+          }
+        };
+        if ( win ) {
+          return true;
+        }
+      };
+      // 检查右斜  块级作用域
+      {
+        let win = true;
+        for ( let j = 0; j < 3; j++){
+          if ( patten[j][2-j] !== color){
+            win = false
+          }
+        };
+        if ( win ) {
+          return true;
+        }
+      };
+      // 都不满足 返回 false
+      return false;
+    }
+    
+    function deepClone(patten){
+      return JSON.parse(JSON.stringify(patten));
+    }
+
+    function willWin(patten, color) {
+      for ( let i = 0; i < 3; i++){
+        for( let j = 0; j< 3; j++){
+          if(patten[i][j])
+            continue;
+          let temp = deepClone(patten);
+          temp[i][j] = color;
+          if ( check(temp, color)){
+            return [j, i];
+          }
+        }
+      };
+      return null;
+    }
+    
+    function bestChoice(patten, color){
+      let p;
+      if ( p = willWin(patten, color)){
+        return {
+          point: p,
+          result: 1
+        }
+      }
+      let result = -2;
+      let point = null;
+      for(let i = 0; i < 3; i++){
+        for(let j = 0; j< 3; j++){
+          if(patten[i][j])
+            continue;
+          let tmp = deepClone(patten);
+          tmp[i][j] = color;
+          let r = bestChoice(tmp, 3 - color).result;
+          if ( -r > result) {
+            result = - r;
+            point = [j, i];
+          }
+        }
+      };
+      return {
+        point: point,
+        result: point ? result : 0
+      }
+    }
+    
+    // function computeMove() {
+    //   let choice = bestChoice(patten, color);
+    //   if (choice.point){
+    //     patten[]
+    //   }
+    // }
+
+    show();
+    console.log(bestChoice(patten, color))
+  </script>
+</body>
+
+</html>
