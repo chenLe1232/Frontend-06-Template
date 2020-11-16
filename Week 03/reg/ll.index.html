@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>正则四则运算</title>
+</head>
+<body>
+  <script>
+    var token = /([0-9\.]+)|([ \t]+)|([\r\n]+)|(\*)|(\+)|(\/)|(\-)/g
+    var dictionary = ['Number', 'WhiteSpace', 'LineTerminator', '*', '-', '+', '/'];
+    function* tokenize(source) {
+      var lastIndex = 0;
+      let result = null;
+      while(true){
+        // lastIndex是正则表达式一个可读可写的整型属性，用来指定下一次匹配的索引
+        lastIndex = token.lastIndex;
+        result = token.exec(source);
+        // 如果匹配成功，exec() 方法返回一个数组（包含额外的属性 index 和 input ，参见下方表格），并更新正则表达式对象的 lastIndex 属性。完全匹配成功的文本将作为返回数组的第一项，从第二项起，后续每项都对应正则表达式内捕获括号里匹配成功的文本
+        if(!result) break;
+        if(token.lastIndex - lastIndex > result[0].length) break;
+
+        let tokenObj = {
+          type: null,
+          value: null,
+        }
+        for(var i = 1; i <= dictionary.length; i++){
+          if(result[i])
+            tokenObj.type = dictionary[i - 1]
+            // console.log(dictionary[i - 1])
+        }
+        tokenObj.value = result[0];
+        yield tokenObj;
+      // console.log(result)
+      }
+    }
+    for(let i of tokenize('10 * 3 + 33 / 55')){
+      console.log(i)
+    }
+  </script>
+</body>
+</html>
